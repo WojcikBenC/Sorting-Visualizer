@@ -5,7 +5,7 @@ enum Algorithm {
 	SELECTION, INSERTION, QUICK, MERGE;
 }
 
-class Main {
+class SortingVisualizer {
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Welcome to sorting visualizer!\n\nPress enter to sort step by step, or enter q to quit.");
