@@ -3,28 +3,36 @@ import java.util.Scanner;
 import java.util.Stack;
 
 class SortingVisualizer {
-	
+
+	private static int length;
 	private static int[] arr;
 	private static Algorithm al;
+	private static boolean reversed;
 	
-	SortingVisualizer() {
-		initArray(10);
-	}
-	
-	SortingVisualizer(int length) {
-		initArray(length);
-	}
+	private static final Scanner scan = new Scanner(System.in);
 
-	private static void initArray(int length) {
+	SortingVisualizer() {
+		System.out.println("Welcome to sorting visualizer!\n\nPress enter to sort step by step, or enter q to quit.");
+	}
+	
+	void initArray() {
 		arr = new int[length];
-		for(int i = 0; i < length; ++i) {
-			arr[i] = i+1;
+		if(!reversed) {
+			System.out.println("test");
+			for(int i = 0; i < length; ++i) {
+				arr[i] = i+1;
+			}
+			for(int j = 0; j < length; ++j) {
+				int r = (int)(Math.random() * length);
+				int temp = arr[j];
+				arr[j] = arr[r];
+				arr[r] = temp;
+			}
 		}
-		for(int j = 0; j < length; ++j) {
-			int r = (int)(Math.random() * length);
-			int temp = arr[j];
-			arr[j] = arr[r];
-			arr[r] = temp;
+		else {
+			for(int i = 0; i < length; ++i) {
+				arr[i] = length-i;
+			}
 		}
 	}
 
@@ -41,7 +49,20 @@ class SortingVisualizer {
 		System.out.print("\n");
 	}
 
-	void inputAlgorithm(Scanner scan) {
+	void inputLength() {
+		System.out.println("\nPlease enter an array length: ");
+		while(length < 2) {
+			try {
+				length = scan.nextInt();
+				if(length < 2) System.out.println("Please enter an integer greater than 1: ");
+			}catch(InputMismatchException e) {
+				System.out.println("Please enter an integer greater than 1: ");
+			}
+			scan.nextLine();
+		}
+	}
+
+	void inputAlgorithm() {
 		System.out.println("Please enter a sorting algorithm [selection, insertion, quick, merge]: ");
 		Algorithm al = null;
 		String s = "";
@@ -60,14 +81,34 @@ class SortingVisualizer {
 		SortingVisualizer.al = al;
 	}
 
-	void sortSteps(Scanner scan) {
+	void inputReversed() {
+		System.out.println("Please choose if you want the array random or reversed: ");
+		boolean chosen = false;
+		String s = "";
+		while(!chosen) {
+			try {
+				s = scan.nextLine();
+				if(s.equalsIgnoreCase("random")) {
+					chosen = true;
+					reversed = false;
+				}
+				else if(s.equalsIgnoreCase("reversed")) {
+					chosen = true;
+					reversed = true;
+				}
+				else System.out.println("Please enter either [random, reversed]: ");
+			} catch(InputMismatchException e) {
+				System.out.println("Please enter either [random, reversed]: ");
+			}
+		}
+	}
+
+	void sortSteps() {
 		System.out.println("\nPress enter for each step of sorting:");
 		int at = 0;
-		int qhi = arr.length-1;
-		int qlo = 0;
 		Stack<Integer> qstack = new Stack<Integer>();
-		qstack.push(qlo);
-		qstack.push(qhi);
+		qstack.push(0);
+		qstack.push(arr.length-1);
 		while(!inOrder()) {
 			String str = scan.nextLine();
 			if(str.equalsIgnoreCase("q")) break;
@@ -93,12 +134,12 @@ class SortingVisualizer {
 			++at;
 		}
 	}
-	
+
 	private static boolean inOrder() {
-		for(int i = 0; i < arr.length-1; ++i) if(arr[i] >= arr[i+1]) return false;
+		for(int i = 1; i < arr.length; ++i) if(arr[i-1] >= arr[i]) return false;
 		return true;
 	}
-	
+
 	private static void selectionSort(int at) {
 		int min = at;
 		for (int i = at+1; i < arr.length; i++) if (arr[i] < arr[min]) min = i; 
@@ -106,7 +147,7 @@ class SortingVisualizer {
 		arr[min] = arr[at]; 
 		arr[at] = temp; 
 	}
-	
+
 	private static void insertionSort(int at) {
 		int i = at-1;
 		int min = arr[at];
@@ -116,24 +157,24 @@ class SortingVisualizer {
 		}
 		arr[i+1] = min;
 	}
-	
+
 	/*
 	 * Referenced: https://www.geeksforgeeks.org/iterative-quick-sort/
 	 */
 	private static void quickSort(Stack<Integer> qstack) {
 		int qhi = qstack.pop();
-        int qlo = qstack.pop();
-        int part = quickSortPartition(qhi, qlo); 
-        if (part - 1 > qlo) { 
-            qstack.push(qlo);
-            qstack.push(part-1); 
-        } 
-        if (part + 1 < qhi) { 
-            qstack.push(part+1); 
-            qstack.push(qhi);
-        }
+		int qlo = qstack.pop();
+		int part = quickSortPartition(qhi, qlo); 
+		if (part - 1 > qlo) { 
+			qstack.push(qlo);
+			qstack.push(part-1); 
+		} 
+		if (part + 1 < qhi) { 
+			qstack.push(part+1); 
+			qstack.push(qhi);
+		}
 	}
-	
+
 	private static int quickSortPartition(int hi, int lo) {
 		int piv = arr[hi];
 		int s = lo-1;
