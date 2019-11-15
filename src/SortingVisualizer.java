@@ -8,13 +8,13 @@ class SortingVisualizer {
 	private static int[] arr;
 	private static Algorithm al;
 	private static boolean reversed;
-	
+
 	private static final Scanner scan = new Scanner(System.in);
 
 	SortingVisualizer() {
 		System.out.println("Welcome to sorting visualizer!\n\nPress enter to sort step by step, or enter q to quit.");
 	}
-	
+
 	void initArray() {
 		arr = new int[length];
 		if(!reversed) {
@@ -107,8 +107,10 @@ class SortingVisualizer {
 		System.out.println("\nPress enter for each step of sorting:");
 		int at = 0;
 		Stack<Integer> qstack = new Stack<Integer>();
-		qstack.push(0);
-		qstack.push(arr.length-1);
+		Stack<Integer> mstack = new Stack<Integer>();
+		qstack.add(0);
+		qstack.add(arr.length-1);
+		mstack = split(mstack, 0, arr.length-1);
 		while(!inOrder()) {
 			String str = scan.nextLine();
 			if(str.equalsIgnoreCase("q")) break;
@@ -125,6 +127,7 @@ class SortingVisualizer {
 					quickSort(qstack);
 					break;
 				case MERGE:
+					mergeSort(mstack);
 					break;
 				default:
 					throw new IllegalArgumentException("ERROR: Invalid algorithm!");
@@ -190,5 +193,58 @@ class SortingVisualizer {
 		arr[s+1] = arr[hi];
 		arr[hi] = temp;
 		return s+1;
+	}
+
+	private static void mergeSort(Stack<Integer> mstack) {
+		int left = mstack.pop();
+		System.out.println("Left: " + left);
+		int right = mstack.pop();
+		System.out.println("Right: " + right);
+		if(right > left) {
+			int mid = (left+right)/2;
+			merge(left, mid, right);
+		}
+	}
+	
+	private static Stack<Integer> split(Stack<Integer> mstack, int left, int right) {
+		if(right > left) {
+			int mid = (left+right)/2;
+			mstack.push(right);
+			mstack.push(left);
+			mstack = split(mstack, left, mid);
+			mstack = split(mstack, mid+1, right);
+		}
+		return mstack;
+	}
+
+	private static void merge(int left, int mid, int right) {
+		int n1 = mid - left + 1;
+		int n2 = right - mid;
+		int L[] = new int [n1]; 
+		int R[] = new int [n2]; 
+		for (int i=0; i<n1; ++i) L[i] = arr[left + i]; 
+		for (int j=0; j<n2; ++j) R[j] = arr[mid + 1+ j]; 
+		int i = 0, j = 0; 
+		int k = left; 
+		while (i < n1 && j < n2) { 
+			if (L[i] <= R[j]) { 
+				arr[k] = L[i]; 
+				i++; 
+			} else { 
+				arr[k] = R[j]; 
+				j++; 
+			} 
+			k++; 
+		} 
+		while (i < n1) { 
+			arr[k] = L[i]; 
+			i++; 
+			k++; 
+		} 
+		while (j < n2) { 
+			arr[k] = R[j]; 
+			j++; 
+			k++; 
+		}
 	}
 }
